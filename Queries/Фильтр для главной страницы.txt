@@ -1,0 +1,16 @@
+SELECT
+t_Task.id,
+STRFTIME("%d.%m.%Y", t_Task.date),
+t_Customer.customer_name,
+t_Task.workers_in_task,
+t_Task.note,
+(CASE t_Task.status   WHEN 1 THEN "Выполнено" WHEN 0 THEN "В работе" END)
+FROM t_Task
+INNER JOIN t_Customer ON t_Task.id_t_Customer = t_Customer.id 
+WHERE 
+    (CASE WHEN {chCompliteTasks}=1 AND {chNotCompliteTasks}=0 THEN t_Task.status = 0
+    WHEN {chCompliteTasks}=0 AND {chNotCompliteTasks}=1 THEN t_Task.status = 1
+    ELSE t_Task.status <> -1 END)
+AND t_Task.date BETWEEN {dateStartTasks} AND {dateEndTasks}
+AND (CASE WHEN {cbSerchCustomer}=-1 THEN t_Task.id_t_Customer <> -1 ELSE t_Task.id_t_Customer ={cbSerchCustomer} END );
+ORDER BY t_Task.id DESC

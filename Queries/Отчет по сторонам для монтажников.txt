@@ -1,0 +1,24 @@
+SELECT
+	CONCAT(t_Worker.last_name, " ", t_Worker.first_name) AS `Исполнитель`,
+	t_Task.id AS `№ Задания`,
+	DATE_FORMAT(t_Task.date, '%d.%m.%Y') AS `Дата задания`,
+	t_Customer.customer_name AS `Заказчик`,
+	t_Task.num_workers AS `Кол-во исп.`,
+	t_Format.format_name AS `Формат`,
+	t_Work.work_name AS `Работы`,
+	t_Adres.adres AS `Адрес`,
+	t_Place.place_name AS `Сторона`,
+	DATE_FORMAT(t_Adres_Task.date, '%d.%m.%Y') AS `Выдано на:`,
+	t_Adres_Task.old_poster AS `Старый постер`,
+	t_Adres_Task.new_poster AS `Новый постер` 
+FROM
+	t_Adres_Task
+	INNER JOIN t_Task ON t_Adres_Task.id_t_Task = t_Task.id
+	INNER JOIN t_Worker_Task ON t_Task.id = t_Worker_Task.id_t_Task
+	INNER JOIN t_Worker ON t_Worker_Task.id_t_Worker = t_Worker.id
+	INNER JOIN t_Customer ON t_Task.id_t_Customer = t_Customer.id
+	INNER JOIN t_Format ON t_Adres_Task.id_t_Format = t_Format.id
+	INNER JOIN t_Work ON t_Adres_Task.id_t_Work = t_Work.id
+	INNER JOIN t_Adres ON t_Adres_Task.id_t_Adres = t_Adres.id AND t_Customer.id = t_Adres.id_t_Customer AND t_Format.id = t_Adres.id_t_Format
+	INNER JOIN t_Place ON t_Adres_Task.id_t_Place = t_Place.id
+ORDER BY t_Worker_Task.id_t_Worker ASC, t_Task.id_t_Customer ASC, t_Adres_Task.date ASC
