@@ -5,7 +5,7 @@ var
  // Глобальная переменная, содержащая id задания (требуется для формирования отчета)
 var
   TaskID: integer;
-
+       //Test
 procedure ResizeColumn();
 begin
      //frm_Main.tg_Task_List.BestFitColumns(bfBoth);
