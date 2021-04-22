@@ -114,12 +114,10 @@ procedure frm_Task_cb_Customer_F_Task_OnChange (Sender: TObject);
 var
 TempCustomerTask : integer;
 begin
-    CustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex;
+    TempCustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex;
     CheckButton();
-    //Повтор кода - исправить
-    TempCustomerTask := frm_Task.cb_Customer_F_Task.ItemIndex;
-    frm_Task_Adres.cb_Adres_F_Task_Adres.dbFilter := 'id_t_Customer =' + IntToStr(TempCustomerTask);
-    frm_Task_Adres.cb_Adres_F_Task_Adres.dbUpdate;
+    FilterForAdres(TempCustomerTask);
+
 end;
 
 // ...........................................................................Проверка id заказчика при загрузке формы.
@@ -127,17 +125,10 @@ procedure frm_Task_OnShow (Sender: TObject; Action: string);
 var
 TempCustomerTask : integer;
 begin
-     CustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex ;
+     TempCustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex ;
      CheckButton();
      frm_Task.txt_TaskID.Text:= IntToStr(TaskID);
-
-    //Повтор кода - исправить 
-     TempCustomerTask := frm_Task.cb_Customer_F_Task.ItemIndex;
-     if TempCustomerTask > 0 then
-      begin
-        frm_Task_Adres.cb_Adres_F_Task_Adres.dbFilter := 'id_t_Customer =' + IntToStr(TempCustomerTask);
-        frm_Task_Adres.cb_Adres_F_Task_Adres.dbUpdate;
-      end;
+     FilterForAdres(TempCustomerTask);
 
 end;
 
@@ -442,14 +433,22 @@ begin
 end;
 
 // ..........................................................................Фильтрование адресов задания в комбобоксе в зависимомти от заказчика
-{procedure frm_Task_Adres_cb_Format_F_Task_Adres_OnChange (Sender: TObject);
-var
-CustomerTaskID : integer;
+procedure FilterForAdres (Customer : integer);
 begin
-     CustomerTaskID := frm_Task.cb_Customer_F_Task.ItemIndex;
-    frm_Task_Adres.cb_Adres_F_Task_Adres.dbFilter := 'id_t_Customer =' + IntToStr(CustomerTaskID);
-    frm_Task_Adres.cb_Adres_F_Task_Adres.dbUpdate;   
-end; }
+     if Customer > 0 then
+      begin
+        frm_Task_Adres.cb_Adres_F_Task_Adres.dbFilter := 'id_t_Customer =' + IntToStr(Customer);
+        frm_Task_Adres.cb_Adres_F_Task_Adres.dbUpdate;
+      end;
+end;
+
+procedure frm_Task_Adres_cb_Format_F_Task_Adres_OnChange (Sender: TObject);
+var
+TempCustomerTask : integer;
+begin
+TempCustomerTask := frm_Task.cb_Customer_F_Task.ItemIndex;
+   FilterForAdres(TempCustomerTask);
+end;
 
 //............................................................................Загрузка актуальной цены при выборе работы
  procedure frm_Task_Adres_cb_Work_F_Task_Adres_OnChange (Sender: TObject);
