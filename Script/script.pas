@@ -111,13 +111,9 @@ end;
 
 // ...........................................................................Заполнение переменной "CustomerTask" при выборе заказчика в комбобоксе при выдаче задания.
 procedure frm_Task_cb_Customer_F_Task_OnChange (Sender: TObject);
-var
-TempCustomerTask : integer;
 begin
-    TempCustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex;
+    CustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex;
     CheckButton();
-    FilterForAdres(TempCustomerTask);
-
 end;
 
 // ...........................................................................Проверка id заказчика при загрузке формы.
@@ -129,7 +125,7 @@ begin
      CheckButton();
      frm_Task.txt_TaskID.Text:= IntToStr(TaskID);
      FilterForAdres(TempCustomerTask);
-
+     FilterForFormat(TempCustomerTask);
 end;
 
 // ...........................................................................Модуль подсчета исполнителей при выдаче задания
@@ -398,9 +394,7 @@ procedure frm_Task_Adres_OnShow (Sender: TObject; Action: string);
     create_date : string;
     TempCustomerTask : integer;
 begin
-
-
-
+//................................................................Заполнение TableGrid, содержащий историю размещения по сторонам
 
                 id_address :=  frm_Task_Adres.cb_Adres_F_Task_Adres.dbItemID;
                 create_date :=  frm_Task.create_date.sqlDate;
@@ -416,22 +410,20 @@ begin
                 ' HAVING MAX(t_Adres_Task.date) <= ' + create_date;
                 frm_Task_Adres.tg_Posters.dbSQLExecute;
 
-//................................................................Заполнение комбобокса "Формат" при выдаче задания в зависимости от заказчика.
-    TempCustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex;
-    if (frm_Task_Adres.cb_Format_F_Task_Adres.ItemIndex <= 0) then
-       begin
+end;
+
+
+procedure FilterForFormat (Customer : integer);
+begin
+     if Customer > 0 then
+      begin
         frm_Task_Adres.cb_Format_F_Task_Adres.dbSQLExecute ('SELECT t_Format.id AS id, t_Format.format_name ' +
         ' FROM t_Format ' +
         ' INNER JOIN t_Adres ON t_Adres.id_t_Format = t_Format.id ' +
-        ' WHERE t_Adres.id_t_Customer = ' + IntToStr(TempCustomerTask) +
+        ' WHERE t_Adres.id_t_Customer = ' + IntToStr(Customer) +
         ' GROUP BY t_Format.id ' );
-       end
-     else
-        begin
-        end;
-
+      end;
 end;
-
 // ..........................................................................Фильтрование адресов задания в комбобоксе в зависимомти от заказчика
 procedure FilterForAdres (Customer : integer);
 begin
@@ -442,13 +434,6 @@ begin
       end;
 end;
 
-procedure frm_Task_Adres_cb_Format_F_Task_Adres_OnChange (Sender: TObject);
-var
-TempCustomerTask : integer;
-begin
-TempCustomerTask := frm_Task.cb_Customer_F_Task.ItemIndex;
-   FilterForAdres(TempCustomerTask);
-end;
 
 //............................................................................Загрузка актуальной цены при выборе работы
  procedure frm_Task_Adres_cb_Work_F_Task_Adres_OnChange (Sender: TObject);
