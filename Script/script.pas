@@ -5,7 +5,8 @@ var
  // Глобальная переменная, содержащая id задания (требуется для формирования отчета)
 var
   TaskID: integer;
- //Test Test
+
+
 procedure ResizeColumn();
 begin
      //frm_Main.tg_Task_List.BestFitColumns(bfBoth);
@@ -110,17 +111,34 @@ end;
 
 // ...........................................................................Заполнение переменной "CustomerTask" при выборе заказчика в комбобоксе при выдаче задания.
 procedure frm_Task_cb_Customer_F_Task_OnChange (Sender: TObject);
+var
+TempCustomerTask : integer;
 begin
     CustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex;
     CheckButton();
+    //Повтор кода - исправить
+    TempCustomerTask := frm_Task.cb_Customer_F_Task.ItemIndex;
+    frm_Task_Adres.cb_Adres_F_Task_Adres.dbFilter := 'id_t_Customer =' + IntToStr(TempCustomerTask);
+    frm_Task_Adres.cb_Adres_F_Task_Adres.dbUpdate;
 end;
 
 // ...........................................................................Проверка id заказчика при загрузке формы.
 procedure frm_Task_OnShow (Sender: TObject; Action: string);
+var
+TempCustomerTask : integer;
 begin
      CustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex ;
      CheckButton();
      frm_Task.txt_TaskID.Text:= IntToStr(TaskID);
+
+    //Повтор кода - исправить 
+     TempCustomerTask := frm_Task.cb_Customer_F_Task.ItemIndex;
+     if TempCustomerTask > 0 then
+      begin
+        frm_Task_Adres.cb_Adres_F_Task_Adres.dbFilter := 'id_t_Customer =' + IntToStr(TempCustomerTask);
+        frm_Task_Adres.cb_Adres_F_Task_Adres.dbUpdate;
+      end;
+
 end;
 
 // ...........................................................................Модуль подсчета исполнителей при выдаче задания
@@ -387,11 +405,15 @@ procedure frm_Task_Adres_OnShow (Sender: TObject; Action: string);
     var
     id_address : integer;
     create_date : string;
+    TempCustomerTask : integer;
 begin
+
+
+
 
                 id_address :=  frm_Task_Adres.cb_Adres_F_Task_Adres.dbItemID;
                 create_date :=  frm_Task.create_date.sqlDate;
-                frm_Task_Adres.tg_Posters.dbSQL:= 'SELECT '+
+                frm_Task_Adres.tg_Posters.dbSQL := 'SELECT '+
                 ' t_Place.place_name AS "Сторона", '+
                 ' t_Adres_Task.new_poster AS "Постер", '+
                 ' DATE_FORMAT(t_Adres_Task.date, "%d.%m.%Y") AS "Дата" '+
@@ -404,26 +426,30 @@ begin
                 frm_Task_Adres.tg_Posters.dbSQLExecute;
 
 //................................................................Заполнение комбобокса "Формат" при выдаче задания в зависимости от заказчика.
-    CustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex ;
+    TempCustomerTask:= frm_Task.cb_Customer_F_Task.ItemIndex;
     if (frm_Task_Adres.cb_Format_F_Task_Adres.ItemIndex <= 0) then
        begin
         frm_Task_Adres.cb_Format_F_Task_Adres.dbSQLExecute ('SELECT t_Format.id AS id, t_Format.format_name ' +
         ' FROM t_Format ' +
         ' INNER JOIN t_Adres ON t_Adres.id_t_Format = t_Format.id ' +
-        ' WHERE t_Adres.id_t_Customer = ' + IntToStr(CustomerTask) +
+        ' WHERE t_Adres.id_t_Customer = ' + IntToStr(TempCustomerTask) +
         ' GROUP BY t_Format.id ' );
        end
      else
         begin
         end;
+
 end;
 
 // ..........................................................................Фильтрование адресов задания в комбобоксе в зависимомти от заказчика
-procedure frm_Task_Adres_cb_Format_F_Task_Adres_OnChange (Sender: TObject);
+{procedure frm_Task_Adres_cb_Format_F_Task_Adres_OnChange (Sender: TObject);
+var
+CustomerTaskID : integer;
 begin
-    frm_Task_Adres.cb_Adres_F_Task_Adres.dbFilter := 'id_t_Customer =' + IntToStr(CustomerTask);
-    frm_Task_Adres.cb_Adres_F_Task_Adres.dbUpdate;
-end;
+     CustomerTaskID := frm_Task.cb_Customer_F_Task.ItemIndex;
+    frm_Task_Adres.cb_Adres_F_Task_Adres.dbFilter := 'id_t_Customer =' + IntToStr(CustomerTaskID);
+    frm_Task_Adres.cb_Adres_F_Task_Adres.dbUpdate;   
+end; }
 
 //............................................................................Загрузка актуальной цены при выборе работы
  procedure frm_Task_Adres_cb_Work_F_Task_Adres_OnChange (Sender: TObject);
